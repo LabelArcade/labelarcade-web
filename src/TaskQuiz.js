@@ -60,40 +60,39 @@ function TaskQuiz() {
   }, [fetchTask]);
 
   const handleChoice = (choiceKey, taskId) => {
-  const token = getAuthToken();
-  if (!task?.track_id) return;
+    const token = getAuthToken();
+    if (!task?.track_id) return;
 
-  const timeTakenInSeconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : null;
-  setSubmitting(true);
+    const timeTakenInSeconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : null;
+    setSubmitting(true);
 
-  fetch(`${API_BASE}/api/tasks/${task.track_id}/submit`, {
-    method: 'POST',
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "x-api-key": "kt6ZgJC-DnuFaGNvsw3xUSk9D1NA9hFm",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      answer: choiceKey,
-      taskId: task.track_id, 
-      timeTakenInSeconds
+    fetch(`${API_BASE}/api/tasks/${task.track_id}/submit`, {
+      method: 'POST',
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "x-api-key": "kt6ZgJC-DnuFaGNvsw3xUSk9D1NA9hFm",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        answer: choiceKey,
+        taskId:task.id,
+        timeTakenInSeconds
+      })
     })
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      return res.json();
-    })
-    .then((data) => {
-      setConfidence(data.confidence || null);
-      setTimeout(fetchTask, 1500);
-    })
-    .catch((err) => {
-      console.error("Submit Failed:", err);
-      setError(err.message);
-    })
-    .finally(() => setSubmitting(false));
-};
-
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        return res.json();
+      })
+      .then((data) => {
+        setConfidence(data.confidence || null);
+        setTimeout(fetchTask, 1500);
+      })
+      .catch((err) => {
+        console.error("Submit Failed:", err);
+        setError(err.message);
+      })
+      .finally(() => setSubmitting(false));
+  };
 
   if (loading) {
     return (
