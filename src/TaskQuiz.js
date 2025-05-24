@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 function TaskQuiz() {
@@ -18,7 +18,7 @@ function TaskQuiz() {
     return token;
   };
 
-  const fetchTask = () => {
+  const fetchTask = useCallback(() => {
     setLoading(true);
     const token = getAuthToken();
 
@@ -53,11 +53,11 @@ function TaskQuiz() {
         setError(err.message);
       })
       .finally(() => setLoading(false));
-  };
+  }, [API_BASE]);
 
   useEffect(() => {
     fetchTask();
-  }, []);
+  }, [fetchTask]);
 
   const handleChoice = (choiceKey, taskId) => {
     const token = getAuthToken();

@@ -30,7 +30,7 @@ function SubmissionHistory() {
       })
       .then(data => setSubmissions(data))
       .catch(err => setError(err.toString()));
-  }, []);
+  }, [API_BASE]); // ✅ Added API_BASE as dependency
 
   const filteredSubmissions = submissions.filter(s => {
     const created = new Date(s.createdAt);
