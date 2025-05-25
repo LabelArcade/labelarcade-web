@@ -6,6 +6,7 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -32,7 +33,10 @@ function Register() {
 
         if (loginResponse.ok && loginData.token) {
           localStorage.setItem('authToken', loginData.token);
-          navigate('/');
+          setShowToast(true);
+          setTimeout(() => {
+            navigate('/');
+          }, 1500);
         } else {
           setMessage('⚠️ Login failed after registration. Please login manually.');
         }
@@ -71,6 +75,19 @@ function Register() {
       />
       <button onClick={handleRegister} style={{ padding: '0.5rem 1rem' }}>Register</button>
       {message && <p style={{ marginTop: '1rem' }}>{message}</p>}
+
+      {showToast && (
+        <div style={{
+          backgroundColor: '#d4edda',
+          color: '#155724',
+          padding: '1rem',
+          marginTop: '1rem',
+          borderRadius: '5px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+        }}>
+          🎉 Account created! You’re now logged in.
+        </div>
+      )}
     </div>
   );
 }
