@@ -2,21 +2,41 @@ import React, { useEffect, useState } from 'react';
 
 function MyScoreCard() {
   const [profile, setProfile] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken');
+
     fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:8080'}/api/user/profile`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        Authorization: `Bearer ${token}`
       }
     })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const errorText = await res.text(); // log raw error
+          throw new Error(`HTTP ${res.status}: ${errorText}`);
+        }
+        return res.json();
+      })
       .then(data => {
         if (data && data.id) {
           setProfile(data);
         }
       })
-      .catch(err => console.error('❌ Failed to fetch user profile:', err));
+      .catch(err => {
+        console.error('❌ Failed to fetch user profile:', err);
+        setError(err.message); // Optional: display on UI
+      });
   }, []);
+
+  if (error) {
+    return (
+      <div style={{ color: 'red', marginBottom: '1rem' }}>
+        ⚠️ Could not load profile: {error}
+      </div>
+    );
+  }
 
   if (!profile) return null;
 
