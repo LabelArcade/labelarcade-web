@@ -75,7 +75,7 @@ function TaskQuiz() {
       },
       body: JSON.stringify({
         answer: choiceKey,
-        taskId:task.id,
+        taskId: task.id,
         timeTakenInSeconds
       })
     })
