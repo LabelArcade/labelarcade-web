@@ -1,62 +1,76 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/auth/register`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:8080'}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ username, email, password })
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
+      if (response.ok) {
+        setMessage(`✅ Registration successful for ${email}`);
+
+        // Auto login
+        const loginResponse = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:8080'}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const loginData = await loginResponse.json();
+
+        if (loginResponse.ok && loginData.token) {
+          localStorage.setItem('authToken', loginData.token);
+          navigate('/');
+        } else {
+          setMessage('⚠️ Login failed after registration. Please login manually.');
+        }
+      } else {
         setMessage(`❌ ${data.error || 'Registration failed'}`);
-        return;
       }
-
-      // ✅ After successful registration, login to get token
-      const loginRes = await fetch(`${process.env.REACT_APP_API_BASE}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, password: form.password })
-      });
-
-      const loginData = await loginRes.json();
-
-      if (!loginRes.ok) {
-        setMessage(`⚠️ Registered, but login failed: ${loginData.error}`);
-        return;
-      }
-
-      // ✅ Save token
-      localStorage.setItem('authToken', loginData.token);
-
-      setMessage(`✅ Registration successful for ${form.email}`);
     } catch (err) {
-      console.error(err);
-      setMessage('❌ Something went wrong');
+      console.error('❌ Registration error:', err);
+      setMessage('❌ Something went wrong.');
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '4rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: 8 }}>
+    <div style={{ padding: '2rem' }}>
       <h2>Register</h2>
-      <input name="username" placeholder="Username" onChange={handleChange} value={form.username} style={{ width: '100%', marginBottom: 10 }} />
-      <input name="email" placeholder="Email" onChange={handleChange} value={form.email} style={{ width: '100%', marginBottom: 10 }} />
-      <input name="password" type="password" placeholder="Password" onChange={handleChange} value={form.password} style={{ width: '100%', marginBottom: 10 }} />
-      <button onClick={handleRegister} style={{ padding: '8px 16px' }}>Register</button>
-      {message && (
-        <p style={{ marginTop: 16, color: message.startsWith('✅') ? 'green' : 'red' }}>{message}</p>
-      )}
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={e => setUsername(e.target.value)}
+        style={{ display: 'block', margin: '0.5rem 0' }}
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        style={{ display: 'block', margin: '0.5rem 0' }}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        style={{ display: 'block', margin: '0.5rem 0' }}
+      />
+      <button onClick={handleRegister} style={{ padding: '0.5rem 1rem' }}>Register</button>
+      {message && <p style={{ marginTop: '1rem' }}>{message}</p>}
     </div>
   );
 }
