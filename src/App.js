@@ -6,7 +6,8 @@ import SubmissionChart from './SubmissionChart';
 import AverageTimeChart from './AverageTimeChart';
 import Leaderboard from './Leaderboard';
 import MyScoreCard from './MyScoreCard';
-import Register from './Register'; 
+import Register from './Register';
+import Login from './Login'; // ✅ NEW: Login page import
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
           <Link to="/" style={{ color: '#fff', textDecoration: 'none' }}>🏠 Task Quiz</Link>
           <Link to="/history" style={{ color: '#fff', textDecoration: 'none' }}>📊 Submission History</Link>
           <Link to="/leaderboard" style={{ color: '#fff', textDecoration: 'none' }}>🏆 Leaderboard</Link>
-          <Link to="/register" style={{ color: '#fff', textDecoration: 'none' }}>📝 Register</Link> {/* ✅ NEW: Link to register */}
+          <Link to="/register" style={{ color: '#fff', textDecoration: 'none' }}>📝 Register</Link>
+          <Link to="/login" style={{ color: '#fff', textDecoration: 'none' }}>🔐 Login</Link> {/* ✅ NEW */}
         </nav>
 
         {/* Main Routes */}
@@ -47,7 +49,8 @@ function App() {
               }
             />
             <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/register" element={<Register />} /> {/* ✅ NEW: Register route */}
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} /> {/* ✅ Login route added */}
           </Routes>
         </main>
       </div>
